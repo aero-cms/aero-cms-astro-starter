@@ -1,6 +1,65 @@
-<footer class="site-footer">
-  <div class="container">
-    <p><strong>AeroCMS</strong> — Kurumsal web sitesi yönetim sistemi.</p>
-    <p>© {new Date().getFullYear()} AeroCMS. Tüm hakları saklıdır.</p>
+---
+import { cms } from '../lib/cms';
+import { getComponentContent } from '../lib/cms-content';
+import { siteFooterSchema } from '../lib/schemas';
+import { fetchMenu } from '@aero-cms/astro-sdk';
+
+let menuItems: Array<{ id: number; label: string; url?: string }> = [];
+let footerContent = await getComponentContent(cms, siteFooterSchema);
+
+try {
+  const menu = await fetchMenu(cms, 'footer');
+  menuItems = menu.items ?? [];
+} catch {
+  menuItems = [];
+}
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" data-cms-component="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <p class="footer-brand" data-cms-field="siteName">{footerContent.siteName}</p>
+      <p class="footer-desc" data-cms-field="description">{footerContent.description}</p>
+    </div>
+    {menuItems.length > 0 && (
+      <div>
+        <p class="footer-heading">Hızlı Linkler</p>
+        <nav class="footer-links">
+          {menuItems.map((item) => (
+            <a href={item.url || '#'}>{item.label}</a>
+          ))}
+        </nav>
+      </div>
+    )}
+    <div>
+      <p class="footer-heading">İletişim</p>
+      <a href="/iletisim" class="footer-links">İletişim Formu</a>
+    </div>
+  </div>
+  <div class="container footer-copy">
+    <p>© {year} <span data-cms-field="copyright">{footerContent.copyright}</span></p>
   </div>
 </footer>
+
+<style>
+  .footer-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    padding-bottom: 1.5rem;
+  }
+  .footer-brand { font-weight: 700; margin: 0 0 0.5rem; color: #fff; }
+  .footer-desc { margin: 0; font-size: 0.875rem; }
+  .footer-heading { margin: 0 0 0.75rem; font-weight: 600; color: #fff; }
+  .footer-links { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; }
+  .footer-copy {
+    border-top: 1px solid #374151;
+    padding-top: 1.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #9ca3af;
+  }
+  .footer-copy p { margin: 0; }
+</style>

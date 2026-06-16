@@ -1,8 +1,12 @@
 ---
 import { cms } from '../lib/cms';
+import { getComponentContent } from '../lib/cms-content';
+import { siteHeaderSchema } from '../lib/schemas';
 import { fetchMenu } from '@aero-cms/astro-sdk';
 
 let menuItems: Array<{ id: number; label: string; url?: string }> = [];
+let headerContent = await getComponentContent(cms, siteHeaderSchema);
+
 try {
   const menu = await fetchMenu(cms, 'header');
   menuItems = menu.items ?? [];
@@ -11,15 +15,13 @@ try {
 }
 ---
 
-<header class="site-header">
+<header class="site-header" data-cms-component="site-header">
   <div class="container">
-    <a href="/" class="brand">AeroCMS</a>
+    <a href="/" class="brand" data-cms-field="siteName">{headerContent.siteName}</a>
     <nav class="nav">
       {menuItems.map((item) => (
         <a href={item.url || '#'}>{item.label}</a>
       ))}
-      <a href="/haberler">Haberler</a>
-      <a href="/etkinlikler">Etkinlikler</a>
       <a href="/arama">Arama</a>
     </nav>
   </div>

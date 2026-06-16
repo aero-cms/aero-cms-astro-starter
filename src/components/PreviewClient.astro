@@ -39,6 +39,12 @@ const adminOrigin = import.meta.env.PUBLIC_ADMIN_ORIGIN ?? 'http://localhost:517
         previewData[data.componentKey] = data.fields;
         document.querySelectorAll('[data-cms-component="' + data.componentKey + '"]').forEach((node) => {
           node.dispatchEvent(new CustomEvent('cms-preview-update', { detail: data.fields }));
+          Object.entries(data.fields).forEach(([key, value]) => {
+            const el = node.querySelector('[data-cms-field="' + key + '"]');
+            if (el) el.textContent = value;
+            const linkEl = node.querySelector('[data-cms-href="' + key + '"]');
+            if (linkEl instanceof HTMLAnchorElement) linkEl.href = value;
+          });
         });
       }
 
