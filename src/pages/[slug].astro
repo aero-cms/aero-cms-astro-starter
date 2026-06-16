@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { cms } from '../lib/cms';
+import { fetchPage, unwrapCmsData } from '@aero-cms/astro-sdk';
+
+export async function getStaticPaths() {
+  try {
+    const pages = unwrapCmsData(await cms.getPages({ pageSize: 200 }));
+    return pages.map((page) => ({ params: { slug: page.slug } }));
+  } catch {
+    return [];
+  }
+}
+
+const slug = Astro.params.slug;
+let page: Awaited<ReturnType<typeof fetchPage>> | null = null;
+try {
+  page = await fetchPage(cms, slug!);
+} catch {
+  page = null;
+}
+---
+
+<BaseLayout title={page ? `${page.title} | AeroCMS` : 'Sayfa | AeroCMS'}>
+  <article class="section">
+    <div class="container article">
+      {!page ? (
+        <div class="error-box">Sayfa bulunamadı.</div>
+      ) : (
+        <>
+          <h1>{page.title}</h1>
+          <div set:html={page.blocks.map((b) => b.content).join('')} />
+        </>
+      )}
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article { max-width: 48rem; }
+</style>

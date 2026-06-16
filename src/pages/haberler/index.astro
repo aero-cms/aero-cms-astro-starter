@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cms } from '../../lib/cms';
+import { fetchNews } from '@aero-cms/astro-sdk';
+
+const page = Number(Astro.url.searchParams.get('page') || '1');
+let haberler: Awaited<ReturnType<typeof fetchNews>> = [];
+let loadError = false;
+try {
+  haberler = await fetchNews(cms, { page, pageSize: 12 });
+} catch {
+  loadError = true;
+}
+---
+
+<BaseLayout title="Haberler | AeroCMS">
+  <div class="section">
+    <div class="container">
+      <h1 class="page-title">Haberler</h1>
+      {loadError ? (
+        <div class="error-box">Haberler yüklenemedi.</div>
+      ) : haberler.length ? (
+        <div class="card-grid">
+          {haberler.map((h) => (
+            <a class="card" href={`/haberler/${h.id}`}>
+              {h.gorselUrl && <img src={h.gorselUrl} alt={h.baslik} />}
+              <div class="card-body">
+                <p class="meta">{new Date(h.yayinTarihi).toLocaleDateString('tr-TR')}</p>
+                <h3>{h.baslik}</h3>
+                <p>{h.ozet}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : <p class="empty">Henüz haber bulunmuyor.</p>}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .meta { font-size: 0.75rem; color: #6b7280; }
+</style>

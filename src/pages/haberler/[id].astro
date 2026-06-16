@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cms } from '../../lib/cms';
+import { fetchNews, fetchNewsById } from '@aero-cms/astro-sdk';
+
+export async function getStaticPaths() {
+  try {
+    const haberler = await fetchNews(cms, { pageSize: 200 });
+    return haberler.map((h) => ({ params: { id: String(h.id) } }));
+  } catch {
+    return [];
+  }
+}
+
+const id = Number(Astro.params.id);
+let haber: Awaited<ReturnType<typeof fetchNewsById>> | null = null;
+try {
+  haber = await fetchNewsById(cms, id);
+} catch {
+  haber = null;
+}
+---
+
+<BaseLayout title={haber ? `${haber.baslik} | AeroCMS` : 'Haber | AeroCMS'}>
+  <article class="section">
+    <div class="container article">
+      {!haber ? (
+        <div class="error-box">Haber bulunamadı.</div>
+      ) : (
+        <>
+          <a href="/haberler">← Haberler</a>
+          <h1>{haber.baslik}</h1>
+          <p class="meta">{new Date(haber.yayinTarihi).toLocaleDateString('tr-TR')}</p>
+          {haber.gorselUrl && <img src={haber.gorselUrl} alt={haber.baslik} class="cover" />}
+          <div set:html={haber.icerik} />
+        </>
+      )}
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article { max-width: 48rem; }
+  .meta { color: #6b7280; }
+  .cover { width: 100%; border-radius: 0.75rem; margin: 1.5rem 0; }
+</style>

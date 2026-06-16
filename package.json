@@ -1,0 +1,26 @@
+{
+  "name": "aero-cms-astro-starter",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Astro starter website for Aero CMS",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aero-cms/aero-cms-astro-starter.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@aero-cms/astro-sdk": "^1.0.0",
+    "@aero-cms/core": "^1.0.0",
+    "astro": "^6.4.7"
+  }
+}

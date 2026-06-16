@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cms } from '../../lib/cms';
+import { fetchEvents, fetchEventById } from '@aero-cms/astro-sdk';
+
+export async function getStaticPaths() {
+  try {
+    const etkinlikler = await fetchEvents(cms, { pageSize: 200 });
+    return etkinlikler.map((e) => ({ params: { id: String(e.id) } }));
+  } catch {
+    return [];
+  }
+}
+
+const id = Number(Astro.params.id);
+let etkinlik: Awaited<ReturnType<typeof fetchEventById>> | null = null;
+try {
+  etkinlik = await fetchEventById(cms, id);
+} catch {
+  etkinlik = null;
+}
+---
+
+<BaseLayout title={etkinlik ? `${etkinlik.baslik} | AeroCMS` : 'Etkinlik | AeroCMS'}>
+  <article class="section">
+    <div class="container article">
+      {!etkinlik ? (
+        <div class="error-box">Etkinlik bulunamadı.</div>
+      ) : (
+        <>
+          <a href="/etkinlikler">← Etkinlikler</a>
+          <h1>{etkinlik.baslik}</h1>
+          <p class="meta">{etkinlik.konum} · {new Date(etkinlik.baslangicTarihi).toLocaleString('tr-TR')}</p>
+          <div set:html={etkinlik.aciklama} />
+        </>
+      )}
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article { max-width: 48rem; }
+  .meta { color: #6b7280; }
+</style>

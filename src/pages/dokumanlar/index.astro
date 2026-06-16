@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cms } from '../../lib/cms';
+import { unwrapCmsData } from '@aero-cms/astro-sdk';
+
+let docs: Array<{ id: number; baslik: string; aciklama?: string; dosyaUrl?: string }> = [];
+let loadError = false;
+try {
+  docs = unwrapCmsData(await cms.getDocuments({ pageSize: 24 }));
+} catch {
+  loadError = true;
+}
+---
+
+<BaseLayout title="Dokümanlar | AeroCMS">
+  <div class="section">
+    <div class="container">
+      <h1 class="page-title">Dokümanlar</h1>
+      {loadError ? (
+        <div class="error-box">Dokümanlar yüklenemedi.</div>
+      ) : docs.length ? (
+        <ul class="doc-list">
+          {docs.map((doc) => (
+            <li>
+              <a href={doc.dosyaUrl || '#'} target="_blank" rel="noopener">{doc.baslik}</a>
+              {doc.aciklama && <span> — {doc.aciklama}</span>}
+            </li>
+          ))}
+        </ul>
+      ) : <p class="empty">Henüz doküman bulunmuyor.</p>}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .doc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
+  .doc-list a { color: #2563eb; font-weight: 600; }
+</style>

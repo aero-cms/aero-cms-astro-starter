@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { cms } from '../lib/cms';
+import { fetchNews, fetchEvents } from '@aero-cms/astro-sdk';
+
+let haberler: Awaited<ReturnType<typeof fetchNews>> = [];
+let etkinlikler: Awaited<ReturnType<typeof fetchEvents>> = [];
+
+try { haberler = await fetchNews(cms, { pageSize: 6 }); } catch {}
+try { etkinlikler = await fetchEvents(cms, { pageSize: 4 }); } catch {}
+---
+
+<BaseLayout title="AeroCMS">
+  <section class="hero">
+    <div class="container">
+      <h1>AeroCMS</h1>
+      <p>Kurumsal web sitenizi kolayca yönetin</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/haberler">Haberler</a>
+        <a class="btn btn-secondary" href="/etkinlikler">Etkinlikler</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="page-title">Son Haberler</h2>
+      {haberler.length ? (
+        <div class="card-grid">
+          {haberler.map((haber) => (
+            <a class="card" href={`/haberler/${haber.id}`}>
+              {haber.gorselUrl && <img src={haber.gorselUrl} alt={haber.baslik} />}
+              <div class="card-body">
+                <p class="meta">{new Date(haber.yayinTarihi).toLocaleDateString('tr-TR')}</p>
+                <h3>{haber.baslik}</h3>
+                <p>{haber.ozet}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : <p class="empty">Henüz haber bulunmuyor.</p>}
+    </div>
+  </section>
+
+  <section class="section section-muted">
+    <div class="container">
+      <h2 class="page-title">Yaklaşan Etkinlikler</h2>
+      {etkinlikler.length ? (
+        <div class="card-grid">
+          {etkinlikler.map((e) => (
+            <a class="card" href={`/etkinlikler/${e.id}`}>
+              <div class="card-body">
+                <h3>{e.baslik}</h3>
+                <p>{e.konum}</p>
+                <p>{e.aciklama}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : <p class="empty">Henüz etkinlik bulunmuyor.</p>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .meta { font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem; }
+  h3 { margin: 0 0 0.5rem; }
+</style>

@@ -1,0 +1,30 @@
+---
+import { cms } from '../lib/cms';
+import { fetchMenu } from '@aero-cms/astro-sdk';
+
+let menuItems: Array<{ id: number; label: string; url?: string }> = [];
+try {
+  const menu = await fetchMenu(cms, 'header');
+  menuItems = menu.items ?? [];
+} catch {
+  menuItems = [];
+}
+---
+
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="brand">AeroCMS</a>
+    <nav class="nav">
+      {menuItems.map((item) => (
+        <a href={item.url || '#'}>{item.label}</a>
+      ))}
+      <a href="/haberler">Haberler</a>
+      <a href="/etkinlikler">Etkinlikler</a>
+      <a href="/arama">Arama</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .brand { font-weight: 700; font-size: 1.125rem; }
+</style>

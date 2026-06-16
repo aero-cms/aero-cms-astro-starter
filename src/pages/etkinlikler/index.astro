@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { cms } from '../../lib/cms';
+import { fetchEvents } from '@aero-cms/astro-sdk';
+
+let etkinlikler: Awaited<ReturnType<typeof fetchEvents>> = [];
+let loadError = false;
+try {
+  etkinlikler = await fetchEvents(cms, { pageSize: 12 });
+} catch {
+  loadError = true;
+}
+---
+
+<BaseLayout title="Etkinlikler | AeroCMS">
+  <div class="section">
+    <div class="container">
+      <h1 class="page-title">Etkinlikler</h1>
+      {loadError ? (
+        <div class="error-box">Etkinlikler yüklenemedi.</div>
+      ) : etkinlikler.length ? (
+        <div class="card-grid">
+          {etkinlikler.map((e) => (
+            <a class="card" href={`/etkinlikler/${e.id}`}>
+              <div class="card-body">
+                <h3>{e.baslik}</h3>
+                <p>{e.konum}</p>
+                <p>{e.aciklama}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : <p class="empty">Henüz etkinlik bulunmuyor.</p>}
+    </div>
+  </div>
+</BaseLayout>

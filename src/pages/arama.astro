@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { cms } from '../lib/cms';
+import { unwrapCmsData } from '@aero-cms/astro-sdk';
+
+const q = Astro.url.searchParams.get('q')?.trim() ?? '';
+let results: Array<{ title: string; url?: string; excerpt?: string }> = [];
+if (q) {
+  try {
+    results = unwrapCmsData(await cms.search(q, { pageSize: 20 }));
+  } catch {
+    results = [];
+  }
+}
+---
+
+<BaseLayout title="Arama | AeroCMS">
+  <div class="section">
+    <div class="container">
+      <h1 class="page-title">Arama</h1>
+      <form class="search-form" method="get" action="/arama">
+        <input name="q" type="search" value={q} placeholder="Site içinde ara..." />
+        <button class="submit-btn" type="submit">Ara</button>
+      </form>
+      {q && results.length > 0 && (
+        <ul class="results">
+          {results.map((item) => (
+            <li>
+              <a href={item.url || '#'}>{item.title}</a>
+              {item.excerpt && <p>{item.excerpt}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {q && results.length === 0 && <p class="empty">Sonuç bulunamadı.</p>}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .search-form { display: flex; gap: 0.75rem; margin-bottom: 2rem; }
+  .search-form input { flex: 1; padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; }
+  .results { list-style: none; padding: 0; display: grid; gap: 1rem; }
+  .results a { color: #2563eb; font-weight: 600; }
+</style>

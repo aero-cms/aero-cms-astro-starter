@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { cms } from '../lib/cms';
+import { unwrapCmsData } from '@aero-cms/astro-sdk';
+
+let formDef: { title?: string; fields: Array<{ name: string; label: string; type: string }> } | null = null;
+try {
+  formDef = unwrapCmsData(await cms.getForm('iletisim'));
+} catch {
+  formDef = null;
+}
+const apiBase = import.meta.env.ASTRO_CMS_API_URL || 'http://localhost:5047';
+---
+
+<BaseLayout title="İletişim | AeroCMS">
+  <div class="section">
+    <div class="container form-wrap">
+      <h1 class="page-title">{formDef?.title || 'İletişim'}</h1>
+      {formDef ? (
+        <form id="contact-form">
+          {formDef.fields.map((field) => (
+            <div class="form-field">
+              <label for={field.id}>{field.label}</label>
+              {field.type === 'textarea' ? (
+                <textarea id={field.id} name={field.id} rows="4" />
+              ) : (
+                <input id={field.id} name={field.id} type={field.type === 'email' ? 'email' : 'text'} />
+              )}
+            </div>
+          ))}
+          <button class="submit-btn" type="submit">Gönder</button>
+        </form>
+      ) : (
+        <div class="error-box">Form yüklenemedi.</div>
+      )}
+      <p id="form-status" hidden></p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ apiBase }}>
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('form-status');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    status.hidden = false;
+    status.textContent = 'Gönderiliyor...';
+    try {
+      const res = await fetch(`${apiBase}/api/v1/content/forms/iletisim/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (json.success) {
+        status.style.color = '#166534';
+        status.textContent = 'Mesajınız gönderildi.';
+        form.reset();
+      } else {
+        status.style.color = '#991b1b';
+        status.textContent = json.error?.message || 'Gönderim başarısız.';
+      }
+    } catch {
+      status.style.color = '#991b1b';
+      status.textContent = 'Gönderim başarısız.';
+    }
+  });
+</script>
+
+<style>
+  .form-wrap { max-width: 36rem; }
+</style>
