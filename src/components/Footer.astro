@@ -5,7 +5,7 @@ import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { siteFooterSchema } from '../lib/schemas';
 import { fetchMenu } from '@aero-cms/astro-sdk';
 
-const lang = getRequestLang(Astro.cookies);
+const lang = getRequestLang(Astro.cookies, Astro.url);
 const langOpts = cmsLangOptions(lang);
 
 let menuItems: Array<{ id: number; label: string; url?: string }> = [];

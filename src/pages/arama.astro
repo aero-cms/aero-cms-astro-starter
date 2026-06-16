@@ -1,13 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { cms } from '../lib/cms';
+import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { unwrapCmsData } from '@aero-cms/astro-sdk';
 
+const lang = getRequestLang(Astro.cookies, Astro.url);
+const langOpts = cmsLangOptions(lang);
 const q = Astro.url.searchParams.get('q')?.trim() ?? '';
 let results: Array<{ title: string; url?: string; excerpt?: string }> = [];
 if (q) {
   try {
-    results = unwrapCmsData(await cms.search(q, { pageSize: 20 }));
+    results = unwrapCmsData(await cms.search(q, { pageSize: 20, ...langOpts }));
   } catch {
     results = [];
   }

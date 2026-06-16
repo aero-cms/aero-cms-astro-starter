@@ -11,7 +11,15 @@ RUN npm ci 2>/dev/null || npm install
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:22-alpine
+WORKDIR /app
+ARG ASTRO_CMS_API_URL=http://api:8090
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3000
+ENV ASTRO_CMS_API_URL=$ASTRO_CMS_API_URL
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
+EXPOSE 3000
+CMD ["node", "./dist/server/entry.mjs"]

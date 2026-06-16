@@ -4,7 +4,7 @@ import { cms } from '../../lib/cms';
 import { getRequestLang, cmsLangOptions } from '../../lib/i18n';
 import { fetchNews } from '@aero-cms/astro-sdk';
 
-const lang = getRequestLang(Astro.cookies);
+const lang = getRequestLang(Astro.cookies, Astro.url);
 const langOpts = cmsLangOptions(lang);
 const page = Number(Astro.url.searchParams.get('page') || '1');
 let haberler: Awaited<ReturnType<typeof fetchNews>> = [];

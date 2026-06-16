@@ -4,7 +4,7 @@ import { cms } from '../../lib/cms';
 import { getRequestLang, cmsLangOptions } from '../../lib/i18n';
 import { fetchEvents } from '@aero-cms/astro-sdk';
 
-const lang = getRequestLang(Astro.cookies);
+const lang = getRequestLang(Astro.cookies, Astro.url);
 const langOpts = cmsLangOptions(lang);
 let etkinlikler: Awaited<ReturnType<typeof fetchEvents>> = [];
 let loadError = false;

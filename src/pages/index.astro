@@ -7,7 +7,7 @@ import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { eventsListSchema, heroSchema, newsListSchema } from '../lib/schemas';
 import { fetchNews, fetchEvents } from '@aero-cms/astro-sdk';
 
-const lang = getRequestLang(Astro.cookies);
+const lang = getRequestLang(Astro.cookies, Astro.url);
 const langOpts = cmsLangOptions(lang);
 
 let haberler: Awaited<ReturnType<typeof fetchNews>> = [];

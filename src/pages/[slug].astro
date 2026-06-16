@@ -2,26 +2,19 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { cms } from '../lib/cms';
 import { getRequestLang, cmsLangOptions } from '../lib/i18n';
-import { fetchPage, unwrapCmsData } from '@aero-cms/astro-sdk';
+import { fetchPage } from '@aero-cms/astro-sdk';
 
-const lang = getRequestLang(Astro.cookies);
+const lang = getRequestLang(Astro.cookies, Astro.url);
 const langOpts = cmsLangOptions(lang);
-
-export async function getStaticPaths() {
-  try {
-    const pages = unwrapCmsData(await cms.getPages({ pageSize: 200 }));
-    return pages.map((page) => ({ params: { slug: page.slug } }));
-  } catch {
-    return [];
-  }
-}
-
 const slug = Astro.params.slug;
+
 let page: Awaited<ReturnType<typeof fetchPage>> | null = null;
-try {
-  page = await fetchPage(cms, slug!, langOpts);
-} catch {
-  page = null;
+if (slug) {
+  try {
+    page = await fetchPage(cms, slug, langOpts);
+  } catch {
+    page = null;
+  }
 }
 ---
 

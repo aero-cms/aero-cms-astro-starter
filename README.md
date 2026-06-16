@@ -41,7 +41,7 @@ PUBLIC_ADMIN_ORIGIN=http://localhost:5173
 | `/iletisim` | CMS formu |
 | `/arama` | Site içi arama |
 | `/[slug]` | CMS sayfaları |
-| `/sitemap.xml` | Build-time sitemap |
+| `/sitemap.xml` | Dinamik sitemap |
 | `/robots.txt` | Arama motoru kuralları |
 
 ## Schema Sync
@@ -58,20 +58,23 @@ URL'de `?cms-preview=true` ile admin panelden canlı önizleme çalışır. `PUB
 
 ## Çoklu Dil (i18n)
 
-Header'daki dil seçici `aero_lang` çerezini ayarlar. `astro dev` sırasında içerik seçilen dile göre yüklenir; statik build çıktısında varsayılan dil kullanılır.
+Header'daki dil seçici `aero_lang` çerezini ayarlar. SSR modunda her istekte seçilen dil ile CMS içeriği yüklenir (`@astrojs/node`).
 
 ## Build ve Docker
 
 ```bash
 npm run build
-npm run preview
+npm run start
 ```
 
-Statik çıktı `dist/` klasöründe üretilir.
+Production çıktısı Node standalone server (`dist/server/entry.mjs`).
 
 ```bash
 docker build -t aero-cms-astro-starter .
-docker run --rm -p 8080:80 aero-cms-astro-starter
+docker run --rm -p 3000:3000 \
+  -e ASTRO_CMS_API_URL=http://host.docker.internal:5047 \
+  -e PUBLIC_ADMIN_ORIGIN=http://host.docker.internal:5173 \
+  aero-cms-astro-starter
 ```
 
 Build argümanları: `ASTRO_CMS_API_URL`, `PUBLIC_SITE_URL`, `PUBLIC_ADMIN_ORIGIN`

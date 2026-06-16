@@ -1,23 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { cms } from '../../lib/cms';
-import { fetchEvents, fetchEventById } from '@aero-cms/astro-sdk';
-
-export async function getStaticPaths() {
-  try {
-    const etkinlikler = await fetchEvents(cms, { pageSize: 200 });
-    return etkinlikler.map((e) => ({ params: { id: String(e.id) } }));
-  } catch {
-    return [];
-  }
-}
+import { fetchEventById } from '@aero-cms/astro-sdk';
 
 const id = Number(Astro.params.id);
+
 let etkinlik: Awaited<ReturnType<typeof fetchEventById>> | null = null;
-try {
-  etkinlik = await fetchEventById(cms, id);
-} catch {
-  etkinlik = null;
+if (Number.isFinite(id)) {
+  try {
+    etkinlik = await fetchEventById(cms, id);
+  } catch {
+    etkinlik = null;
+  }
 }
 ---
 
