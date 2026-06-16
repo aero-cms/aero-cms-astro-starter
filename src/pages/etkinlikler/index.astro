@@ -1,12 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { cms } from '../../lib/cms';
+import { getRequestLang, cmsLangOptions } from '../../lib/i18n';
 import { fetchEvents } from '@aero-cms/astro-sdk';
 
+const lang = getRequestLang(Astro.cookies);
+const langOpts = cmsLangOptions(lang);
 let etkinlikler: Awaited<ReturnType<typeof fetchEvents>> = [];
 let loadError = false;
 try {
-  etkinlikler = await fetchEvents(cms, { pageSize: 12 });
+  etkinlikler = await fetchEvents(cms, { pageSize: 12, ...langOpts });
 } catch {
   loadError = true;
 }

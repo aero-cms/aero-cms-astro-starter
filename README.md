@@ -56,6 +56,10 @@ Schema tanımları: `src/lib/schemas.ts`
 
 URL'de `?cms-preview=true` ile admin panelden canlı önizleme çalışır. `PUBLIC_ADMIN_ORIGIN` allowlist olarak kullanılır.
 
+## Çoklu Dil (i18n)
+
+Header'daki dil seçici `aero_lang` çerezini ayarlar. `astro dev` sırasında içerik seçilen dile göre yüklenir; statik build çıktısında varsayılan dil kullanılır.
+
 ## Build ve Docker
 
 ```bash

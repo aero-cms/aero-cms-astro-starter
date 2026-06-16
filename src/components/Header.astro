@@ -1,11 +1,17 @@
 ---
 import { cms } from '../lib/cms';
 import { getComponentContent } from '../lib/cms-content';
+import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { siteHeaderSchema } from '../lib/schemas';
 import { fetchMenu } from '@aero-cms/astro-sdk';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+const lang = getRequestLang(Astro.cookies);
+const langOpts = cmsLangOptions(lang);
 
 let menuItems: Array<{ id: number; label: string; url?: string }> = [];
-let headerContent = await getComponentContent(cms, siteHeaderSchema);
+let headerContent = await getComponentContent(cms, siteHeaderSchema, langOpts);
+let languages: Array<{ code: string; name: string; isDefault?: boolean }> = [];
 
 try {
   const menu = await fetchMenu(cms, 'header');
@@ -13,20 +19,40 @@ try {
 } catch {
   menuItems = [];
 }
+
+try {
+  const res = await cms.getLanguages();
+  languages = (res.data ?? []).filter((l) => l.isActive).map((l) => ({
+    code: l.code,
+    name: l.name,
+    isDefault: l.isDefault,
+  }));
+} catch {
+  languages = [];
+}
 ---
 
 <header class="site-header" data-cms-component="site-header">
   <div class="container">
     <a href="/" class="brand" data-cms-field="siteName">{headerContent.siteName}</a>
-    <nav class="nav">
-      {menuItems.map((item) => (
-        <a href={item.url || '#'}>{item.label}</a>
-      ))}
-      <a href="/arama">Arama</a>
-    </nav>
+    <div class="header-actions">
+      <nav class="nav">
+        {menuItems.map((item) => (
+          <a href={item.url || '#'}>{item.label}</a>
+        ))}
+        <a href="/arama">Arama</a>
+      </nav>
+      <LanguageSwitcher languages={languages} currentLang={lang} />
+    </div>
   </div>
 </header>
 
 <style>
   .brand { font-weight: 700; font-size: 1.125rem; }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 </style>

@@ -1,7 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { cms } from '../lib/cms';
+import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { fetchPage, unwrapCmsData } from '@aero-cms/astro-sdk';
+
+const lang = getRequestLang(Astro.cookies);
+const langOpts = cmsLangOptions(lang);
 
 export async function getStaticPaths() {
   try {
@@ -15,7 +19,7 @@ export async function getStaticPaths() {
 const slug = Astro.params.slug;
 let page: Awaited<ReturnType<typeof fetchPage>> | null = null;
 try {
-  page = await fetchPage(cms, slug!);
+  page = await fetchPage(cms, slug!, langOpts);
 } catch {
   page = null;
 }

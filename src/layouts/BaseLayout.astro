@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import PreviewClient from '../components/PreviewClient.astro';
 import { cms } from '../lib/cms';
 import { getComponentContent } from '../lib/cms-content';
+import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { siteSeoSchema } from '../lib/schemas';
 
 interface Props {
@@ -13,13 +14,16 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-const seo = await getComponentContent(cms, siteSeoSchema);
+const lang = getRequestLang(Astro.cookies);
+const langOpts = cmsLangOptions(lang);
+const seo = await getComponentContent(cms, siteSeoSchema, langOpts);
 const pageTitle = title ?? seo.siteTitle;
 const pageDescription = description ?? seo.siteDescription;
+const htmlLang = lang ?? 'tr';
 ---
 
 <!doctype html>
-<html lang="tr">
+<html lang={htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />

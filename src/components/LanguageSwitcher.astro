@@ -1,0 +1,41 @@
+---
+interface Props {
+  languages: Array<{ code: string; name: string; isDefault?: boolean }>;
+  currentLang?: string;
+}
+
+const { languages, currentLang } = Astro.props;
+const active =
+  currentLang ?? languages.find((l) => l.isDefault)?.code ?? languages[0]?.code ?? '';
+---
+
+{languages.length > 1 && (
+  <select class="lang-select" aria-label="Dil seçimi" data-lang-switcher value={active}>
+    {languages.map((lang) => (
+      <option value={lang.code} selected={lang.code === active}>
+        {lang.name}
+      </option>
+    ))}
+  </select>
+)}
+
+<script>
+  document.querySelectorAll('[data-lang-switcher]').forEach((select) => {
+    select.addEventListener('change', (event) => {
+      const next = (event.target as HTMLSelectElement).value;
+      document.cookie = `aero_lang=${encodeURIComponent(next)};path=/;max-age=31536000;samesite=lax`;
+      window.location.reload();
+    });
+  });
+</script>
+
+<style>
+  .lang-select {
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #fff;
+    color: #374151;
+  }
+</style>

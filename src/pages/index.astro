@@ -3,17 +3,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import HeroSection from '../components/HeroSection.astro';
 import { cms } from '../lib/cms';
 import { getComponentContent } from '../lib/cms-content';
+import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { eventsListSchema, heroSchema, newsListSchema } from '../lib/schemas';
 import { fetchNews, fetchEvents } from '@aero-cms/astro-sdk';
 
+const lang = getRequestLang(Astro.cookies);
+const langOpts = cmsLangOptions(lang);
+
 let haberler: Awaited<ReturnType<typeof fetchNews>> = [];
 let etkinlikler: Awaited<ReturnType<typeof fetchEvents>> = [];
-let heroContent = await getComponentContent(cms, heroSchema);
-let newsListContent = await getComponentContent(cms, newsListSchema);
-let eventsListContent = await getComponentContent(cms, eventsListSchema);
+let heroContent = await getComponentContent(cms, heroSchema, langOpts);
+let newsListContent = await getComponentContent(cms, newsListSchema, langOpts);
+let eventsListContent = await getComponentContent(cms, eventsListSchema, langOpts);
 
-try { haberler = await fetchNews(cms, { pageSize: 6 }); } catch {}
-try { etkinlikler = await fetchEvents(cms, { pageSize: 4 }); } catch {}
+try { haberler = await fetchNews(cms, { pageSize: 6, ...langOpts }); } catch {}
+try { etkinlikler = await fetchEvents(cms, { pageSize: 4, ...langOpts }); } catch {}
 ---
 
 <BaseLayout title="AeroCMS">
