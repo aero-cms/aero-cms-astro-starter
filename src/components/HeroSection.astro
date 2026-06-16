@@ -1,0 +1,39 @@
+---
+interface Props {
+  content: Record<string, string>;
+}
+
+const { content } = Astro.props;
+---
+
+<section class="hero" data-cms-component="hero-section">
+  <div class="container">
+    <h1 data-cms-field="title">{content.title}</h1>
+    <p data-cms-field="subtitle">{content.subtitle}</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" data-cms-field="ctaText1" data-cms-href="ctaLink1" href={content.ctaLink1}>
+        {content.ctaText1}
+      </a>
+      <a class="btn btn-secondary" data-cms-field="ctaText2" data-cms-href="ctaLink2" href={content.ctaLink2}>
+        {content.ctaText2}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-cms-component="hero-section"]').forEach((section) => {
+    section.addEventListener('cms-preview-update', (event) => {
+      const fields = (event as CustomEvent<Record<string, string>>).detail;
+      if (!fields) return;
+
+      Object.entries(fields).forEach(([key, value]) => {
+        const textEl = section.querySelector(`[data-cms-field="${key}"]`);
+        if (textEl) textEl.textContent = value;
+
+        const linkEl = section.querySelector(`[data-cms-href="${key}"]`);
+        if (linkEl instanceof HTMLAnchorElement) linkEl.href = value;
+      });
+    });
+  });
+</script>

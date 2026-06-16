@@ -1,30 +1,30 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/HeroSection.astro';
 import { cms } from '../lib/cms';
+import { getComponentContent } from '../lib/cms-content';
+import { eventsListSchema, heroSchema, newsListSchema } from '../lib/schemas';
 import { fetchNews, fetchEvents } from '@aero-cms/astro-sdk';
 
 let haberler: Awaited<ReturnType<typeof fetchNews>> = [];
 let etkinlikler: Awaited<ReturnType<typeof fetchEvents>> = [];
+let heroContent = await getComponentContent(cms, heroSchema);
+let newsListContent = await getComponentContent(cms, newsListSchema);
+let eventsListContent = await getComponentContent(cms, eventsListSchema);
 
 try { haberler = await fetchNews(cms, { pageSize: 6 }); } catch {}
 try { etkinlikler = await fetchEvents(cms, { pageSize: 4 }); } catch {}
 ---
 
 <BaseLayout title="AeroCMS">
-  <section class="hero">
-    <div class="container">
-      <h1>AeroCMS</h1>
-      <p>Kurumsal web sitenizi kolayca yönetin</p>
-      <div class="btn-row">
-        <a class="btn btn-primary" href="/haberler">Haberler</a>
-        <a class="btn btn-secondary" href="/etkinlikler">Etkinlikler</a>
-      </div>
-    </div>
-  </section>
+  <HeroSection content={heroContent} />
 
-  <section class="section">
+  <section class="section" data-cms-component="news-list">
     <div class="container">
-      <h2 class="page-title">Son Haberler</h2>
+      <div class="section-header">
+        <h2 class="page-title" data-cms-field="sectionTitle">{newsListContent.sectionTitle}</h2>
+        <a class="view-all" data-cms-field="viewAllText" href="/haberler">{newsListContent.viewAllText}</a>
+      </div>
       {haberler.length ? (
         <div class="card-grid">
           {haberler.map((haber) => (
@@ -42,9 +42,12 @@ try { etkinlikler = await fetchEvents(cms, { pageSize: 4 }); } catch {}
     </div>
   </section>
 
-  <section class="section section-muted">
+  <section class="section section-muted" data-cms-component="events-list">
     <div class="container">
-      <h2 class="page-title">Yaklaşan Etkinlikler</h2>
+      <div class="section-header">
+        <h2 class="page-title" data-cms-field="sectionTitle">{eventsListContent.sectionTitle}</h2>
+        <a class="view-all" data-cms-field="viewAllText" href="/etkinlikler">{eventsListContent.viewAllText}</a>
+      </div>
       {etkinlikler.length ? (
         <div class="card-grid">
           {etkinlikler.map((e) => (
@@ -65,4 +68,29 @@ try { etkinlikler = await fetchEvents(cms, { pageSize: 4 }); } catch {}
 <style>
   .meta { font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem; }
   h3 { margin: 0 0 0.5rem; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .section-header .page-title { margin: 0; }
+  .view-all { font-size: 0.875rem; color: #2563eb; text-decoration: none; }
+  .view-all:hover { text-decoration: underline; }
 </style>
+
+<script>
+  ['news-list', 'events-list'].forEach((componentKey) => {
+    document.querySelectorAll(`[data-cms-component="${componentKey}"]`).forEach((section) => {
+      section.addEventListener('cms-preview-update', (event) => {
+        const fields = (event as CustomEvent<Record<string, string>>).detail;
+        if (!fields) return;
+        Object.entries(fields).forEach(([key, value]) => {
+          const el = section.querySelector(`[data-cms-field="${key}"]`);
+          if (el) el.textContent = value;
+        });
+      });
+    });
+  });
+</script>
