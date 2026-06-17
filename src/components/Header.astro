@@ -1,5 +1,5 @@
 ---
-import { cms } from '../lib/cms';
+import { getCms } from '../lib/cms';
 import { getComponentContent } from '../lib/cms-content';
 import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { siteHeaderSchema } from '../lib/schemas';
@@ -7,6 +7,7 @@ import { fetchMenu } from '@aero-cms/astro-sdk';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 
 const lang = getRequestLang(Astro.cookies, Astro.url);
+const cms = getCms(Astro.request);
 const langOpts = cmsLangOptions(lang);
 
 let menuItems: Array<{ id: number; label: string; url?: string }> = [];

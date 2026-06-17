@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { cms } from '../../lib/cms';
+import { getCms } from '../../lib/cms';
 import { unwrapCmsData } from '@aero-cms/astro-sdk';
 
+const cms = getCms(Astro.request);
 let docs: Array<{ id: number; baslik: string; aciklama?: string; dosyaUrl?: string }> = [];
 let loadError = false;
 try {

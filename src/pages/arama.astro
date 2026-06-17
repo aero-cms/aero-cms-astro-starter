@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { cms } from '../lib/cms';
+import { getCms } from '../lib/cms';
 import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { unwrapCmsData } from '@aero-cms/astro-sdk';
 
 const lang = getRequestLang(Astro.cookies, Astro.url);
+const cms = getCms(Astro.request);
 const langOpts = cmsLangOptions(lang);
 const q = Astro.url.searchParams.get('q')?.trim() ?? '';
 let results: Array<{ title: string; url?: string; excerpt?: string }> = [];

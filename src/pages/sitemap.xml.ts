@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { cms } from '../lib/cms';
+import { getCms } from '../lib/cms';
 import { unwrapCmsData } from '@aero-cms/astro-sdk';
 
 function xmlEscape(value: string) {
@@ -10,8 +10,9 @@ function xmlEscape(value: string) {
     .replace(/"/g, '&quot;');
 }
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
   const siteUrl = (import.meta.env.PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+  const cms = getCms(request);
   const staticPaths = ['', '/haberler', '/etkinlikler', '/dokumanlar', '/iletisim', '/arama'];
 
   const urls: Array<{ loc: string; lastmod?: string; priority?: number }> = staticPaths.map((path) => ({

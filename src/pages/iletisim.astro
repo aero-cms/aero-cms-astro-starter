@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { cms } from '../lib/cms';
+import { getCms } from '../lib/cms';
 import { unwrapCmsData } from '@aero-cms/astro-sdk';
 
+const cms = getCms(Astro.request);
 let formDef: { title?: string; fields: Array<{ name: string; label: string; type: string }> } | null = null;
 try {
   formDef = unwrapCmsData(await cms.getForm('iletisim'));

@@ -1,9 +1,10 @@
-import { createCmsClient } from '@aero-cms/astro-sdk';
+import { cmsFromEnv, cmsFromRequest } from '@aero-cms/astro-sdk';
 
-const baseUrl =
-  import.meta.env.ASTRO_CMS_API_URL ??
-  import.meta.env.PUBLIC_CMS_API_URL ??
-  import.meta.env.CMS_API_URL ??
-  'http://localhost:5047';
+/** Request-scoped client with host-based site resolution (SSR). */
+export function getCms(request?: Request) {
+  if (request) return cmsFromRequest(request, import.meta.env);
+  return cmsFromEnv(import.meta.env);
+}
 
-export const cms = createCmsClient({ baseUrl });
+/** Env-only client (e.g. build-time scripts). */
+export const cms = cmsFromEnv(import.meta.env);

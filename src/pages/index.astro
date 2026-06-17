@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HeroSection from '../components/HeroSection.astro';
-import { cms } from '../lib/cms';
+import { getCms } from '../lib/cms';
 import { getComponentContent } from '../lib/cms-content';
 import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { eventsListSchema, heroSchema, newsListSchema } from '../lib/schemas';
 import { fetchNews, fetchEvents } from '@aero-cms/astro-sdk';
 
 const lang = getRequestLang(Astro.cookies, Astro.url);
+const cms = getCms(Astro.request);
 const langOpts = cmsLangOptions(lang);
 
 let haberler: Awaited<ReturnType<typeof fetchNews>> = [];

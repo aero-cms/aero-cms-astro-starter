@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { cms } from '../../lib/cms';
+import { getCms } from '../../lib/cms';
 import { fetchNewsById } from '@aero-cms/astro-sdk';
 
+const cms = getCms(Astro.request);
 const id = Number(Astro.params.id);
 
 let haber: Awaited<ReturnType<typeof fetchNewsById>> | null = null;

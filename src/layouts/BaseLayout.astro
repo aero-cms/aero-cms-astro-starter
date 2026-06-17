@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PreviewClient from '../components/PreviewClient.astro';
-import { cms } from '../lib/cms';
+import { getCms } from '../lib/cms';
 import { getComponentContent } from '../lib/cms-content';
 import { getRequestLang, cmsLangOptions } from '../lib/i18n';
 import { siteSeoSchema } from '../lib/schemas';
@@ -15,6 +15,7 @@ interface Props {
 
 const { title, description } = Astro.props;
 const lang = getRequestLang(Astro.cookies, Astro.url);
+const cms = getCms(Astro.request);
 const langOpts = cmsLangOptions(lang);
 const seo = await getComponentContent(cms, siteSeoSchema, langOpts);
 const pageTitle = title ?? seo.siteTitle;
