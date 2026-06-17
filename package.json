@@ -13,7 +13,7 @@
     "preview": "astro preview",
     "start": "node ./dist/server/entry.mjs",
     "astro": "astro",
-    "cms:sync": "npx tsx node_modules/@aero-cms/react-sdk/dist/cli.js sync --schemas ./src/lib/schemas.ts"
+    "cms:sync": "npx tsx node_modules/@aero-cms/core/dist/cli.js sync --schemas ./src/lib/schemas.ts"
   },
   "repository": {
     "type": "git",
@@ -21,13 +21,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@aero-cms/astro-sdk": "^1.0.0",
-    "@aero-cms/core": "^1.0.0",
+    "@aero-cms/astro-sdk": "^1.1.1",
+    "@aero-cms/core": "^1.1.0",
     "@astrojs/node": "^10.1.4",
     "astro": "^6.4.7"
   },
   "devDependencies": {
-    "@aero-cms/react-sdk": "^1.0.3",
     "tsx": "^4.19.0"
   }
 }

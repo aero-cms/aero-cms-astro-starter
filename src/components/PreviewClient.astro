@@ -1,65 +1,11 @@
 ---
-const adminOrigin = import.meta.env.PUBLIC_ADMIN_ORIGIN ?? 'http://localhost:5173';
 ---
 
-<script define:vars={{ adminOrigin }}>
-  (function initCmsPreview() {
-    if (typeof window === 'undefined') return;
+<script>
+  import { initCmsPreviewClient } from '@aero-cms/astro-sdk/preview';
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('cms-preview') !== 'true') return;
-
-    const previewData = {};
-    let highlighted = null;
-    let highlightTimer;
-
-    const banner = document.createElement('div');
-    banner.textContent = 'CMS Canlı Önizleme Modu — Değişiklikler henüz kaydedilmedi';
-    banner.setAttribute('style', [
-      'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
-      'background:linear-gradient(135deg,#7c3aed,#6d28d9)', 'color:#fff',
-      'padding:6px 16px', 'font:600 12px system-ui', 'text-align:center',
-    ].join(';'));
-    document.body.prepend(banner);
-    document.body.style.paddingTop = '32px';
-
-    window.addEventListener('message', (event) => {
-      if (event.origin !== adminOrigin) return;
-      const data = event.data;
-      if (data?.type !== 'aero-cms-preview') return;
-
-      if (data.action === 'ping') {
-        window.parent.postMessage(
-          { type: 'aero-cms-preview-ack', action: 'pong', ready: true },
-          adminOrigin,
-        );
-      }
-
-      if (data.action === 'update' && data.componentKey && data.fields) {
-        previewData[data.componentKey] = data.fields;
-        document.querySelectorAll('[data-cms-component="' + data.componentKey + '"]').forEach((node) => {
-          node.dispatchEvent(new CustomEvent('cms-preview-update', { detail: data.fields }));
-          Object.entries(data.fields).forEach(([key, value]) => {
-            const el = node.querySelector('[data-cms-field="' + key + '"]');
-            if (el) el.textContent = value;
-            const linkEl = node.querySelector('[data-cms-href="' + key + '"]');
-            if (linkEl instanceof HTMLAnchorElement) linkEl.href = value;
-          });
-        });
-      }
-
-      if (data.action === 'highlight' && data.componentKey) {
-        if (highlighted) highlighted.removeAttribute('data-cms-highlight');
-        highlighted = document.querySelector('[data-cms-component="' + data.componentKey + '"]');
-        if (highlighted) highlighted.setAttribute('data-cms-highlight', 'true');
-        if (highlightTimer) clearTimeout(highlightTimer);
-        highlightTimer = setTimeout(() => {
-          if (highlighted) highlighted.removeAttribute('data-cms-highlight');
-          highlighted = null;
-        }, 3000);
-      }
-    });
-  })();
+  const adminOrigin = import.meta.env.PUBLIC_ADMIN_ORIGIN ?? 'http://localhost:5173';
+  initCmsPreviewClient({ adminOrigin });
 </script>
 
 <style is:global>
